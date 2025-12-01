@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en-gb">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GCSE Geography Exam Practise</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Use Inter font -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f7f9;
+        }
+        /* Custom styling for prose to match school report aesthetic */
+        .prose p {
+            margin-bottom: 0.75em;
+        }
+        /* Style for the feedback sections to ensure clean display */
+        .feedback-section b {
+            font-weight: 700;
+            color: #1f2937; /* dark grey */
+            display: block;
+            margin-top: 10px;
+        }
+        /* Style for the hint content */
+        .hint-content b {
+            font-weight: 700;
+            color: #3b82f6; /* blue */
+        }
+        .hint-content ul {
+            list-style: disc;
+            margin-left: 20px;
+            padding-left: 0;
+            margin-bottom: 10px;
+        }
+        .hint-content li {
+            margin-bottom: 4px;
+        }
+        .hint-content .section-title {
+            font-weight: 700;
+            color: #1f2937;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            display: block;
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-8">
+
+    <div id="app" class="max-w-4xl mx-auto bg-white shadow-xl rounded-xl p-6 sm:p-10 border-t-4 border-indigo-600">
+
+        <h1 class="text-3xl font-extrabold text-gray-900 mb-2 text-center sm:text-left">
+            <span class="text-indigo-600">AQA GCSE</span> Geography Practise
+        </h1>
+        <p class="text-gray-600 mb-8 text-center sm:text-left">
+            Select your focus areas and desired mark tariff for tailored practise.
+        </p>
+
+        <!-- Configuration Section -->
+        <div class="space-y-4 mb-8 p-4 bg-indigo-50 rounded-lg">
+            <h2 class="text-xl font-semibold text-indigo-800">1. Choose Your Focus</h2>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                
+                <!-- Paper Selector -->
+                <div>
+                    <label for="paper-select" class="block text-sm font-medium text-gray-700 mb-1">Exam Paper</label>
+                    <select id="paper-select" onchange="updateUnits()" class="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 transition duration-150">
+                        <option value="">-- Select Paper --</option>
+                    </select>
+                </div>
+
+                <!-- Unit Selector -->
+                <div>
+                    <label for="unit-select" class="block text-sm font-medium text-gray-700 mb-1">Unit</label>
+                    <select id="unit-select" onchange="updateTopics()" disabled class="w-full p-2 border border-gray-300 rounded-lg shadow-sm bg-gray-100 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150">
+                        <option value="">-- Select Unit --</option>
+                    </select>
+                </div>
+
+                <!-- Topic Selector -->
+                <div>
+                    <label for="topic-select" class="block text-sm font-medium text-gray-700 mb-1">Topic Area</label>
+                    <select id="topic-select" onchange="checkSelections()" disabled class="w-full p-2 border border-gray-300 rounded-lg shadow-sm bg-gray-100 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150">
+                        <option value="">-- Select Topic --</option>
+                    </select>
+                </div>
+
+                <!-- Tariff Selector -->
+                <div>
+                    <label for="tariff-select" class="block text-sm font-medium text-gray-700 mb-1">Question Mark Tariff</label>
+                    <select id="tariff-select" onchange="checkSelections()" class="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 transition duration-150">
+                        <option value="">-- Select Mark --</option>
+                    </select>
+                </div>
+            </div>
+
+            <button id="generate-btn" onclick="generateQuestion()" disabled class="w-full py-3 px-4 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-200 disabled:opacity-50 mt-4">
+                Generate Question
+            </button>
+        </div>
+
+        <!-- Question and Answer Section -->
+        <div id="question-area" class="mt-8 hidden">
+            <h2 class="text-xl font-semibold text-gray-800 mb-3">2. Your Question</h2>
+            <div id="question-display" class="p-4 bg-yellow-50 border-l-4 border-yellow-500 rounded-lg mb-6">
+                <!-- Question content will be injected here -->
+            </div>
+
+            <!-- New Help Buttons -->
+            <div id="help-buttons" class="flex flex-col sm:flex-row gap-4 mb-6">
+                <button onclick="getIndicativeContent()" class="w-full sm:w-1/2 py-2 px-4 border border-indigo-600 text-indigo-600 font-semibold rounded-lg hover:bg-indigo-50 transition duration-200">
+                    1. Indicative Content (Notes)
+                </button>
+                <button onclick="getStrategyGuide()" class="w-full sm:w-1/2 py-2 px-4 border border-indigo-600 text-indigo-600 font-semibold rounded-lg hover:bg-indigo-50 transition duration-200">
+                    2. Structure & Strategy Guide
+                </button>
+            </div>
+            
+            <!-- Help Display Area - Now structured to hold both contents -->
+            <div id="help-content-display" class="mb-6 hidden p-4 bg-blue-50 border-l-4 border-blue-500 rounded-lg transition duration-300 space-y-4">
+                
+                <div id="indicative-content-container" class="border-b border-blue-200 pb-3 last:border-b-0 hidden">
+                    <h3 class="text-xl font-semibold text-blue-800 mb-2" id="indicative-content-title">Indicative Content (Key Revision Notes)</h3>
+                    <div id="indicative-content-text" class="text-gray-700 text-sm hint-content"></div>
+                </div>
+
+                <div id="strategy-guide-container" class="border-b border-blue-200 pb-3 last:border-b-0 hidden">
+                    <h3 class="text-xl font-semibold text-blue-800 mb-2" id="strategy-guide-title">Structure Guide & Examiner Tips</h3>
+                    <div id="strategy-guide-text" class="text-gray-700 text-sm hint-content"></div>
+                </div>
+            </div>
+
+            <h2 class="text-xl font-semibold text-gray-800 mb-3">3. Your Answer</h2>
+            <textarea id="answer-input" rows="8" placeholder="Type your full answer here in British English..." class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition duration-150"></textarea>
+            
+            <button id="feedback-btn" onclick="getFeedback()" class="w-full py-3 px-4 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-200 disabled:opacity-50 mt-4">
+                Get Feedback and Mark
+            </button>
+        </div>
+        
+        <!-- Sample Response Section -->
+        <div id="sample-response-area" class="mt-8 hidden">
+            <h2 class="text-xl font-semibold text-gray-800 mb-3">4. Generate Sample Response</h2>
+            <p class="text-gray-600 mb-4">View model answers at different levels to understand AQA expectations.</p>
+            
+            <div id="sample-buttons" class="grid grid-cols-2 gap-4 mb-4">
+                <button id="sample-l2-btn" onclick="generateSampleResponse('L2')" class="w-full py-3 px-4 bg-yellow-500 text-white font-semibold rounded-lg shadow-md hover:bg-yellow-600 transition duration-200">
+                    Mid-Mark Response
+                </button>
+                <button id="sample-l3-btn" onclick="generateSampleResponse('L3')" class="w-full py-3 px-4 bg-purple-600 text-white font-semibold rounded-lg shadow-md hover:bg-purple-700 transition duration-200">
+                    Top-Mark Response
+                </button>
+            </div>
+            
+            <div id="sample-display" class="p-6 bg-gray-100 border border-gray-300 rounded-lg shadow-inner prose max-w-none text-sm">
+                <p>Click a button above to generate a model response based on the question.</p>
+            </div>
+        </div>
+
+        <!-- Feedback Section -->
+        <div id="feedback-area" class="mt-8 hidden">
+            <h2 class="text-xl font-semibold text-gray-800 mb-3">5. Examiner Feedback</h2>
+            <div id="feedback-display" class="p-6 bg-white border border-gray-200 rounded-lg shadow-inner feedback-section">
+                <!-- Feedback, mark, and level will be injected here -->
+            </div>
+            <button onclick="resetPractice()" class="w-full py-3 px-4 bg-gray-500 text-white font-semibold rounded-lg shadow-md hover:bg-gray-600 transition duration-200 mt-4">
+                Start New Practise
+            </button>
+        </div>
+
+        <!-- Loading/Status Message -->
+        <div id="status-message" class="mt-6 text-center text-indigo-600 font-medium hidden">
+            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-indigo-500 inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Processing...
+        </div>
+
+    </div>
+
+    <script type="module">
+        // --- Configuration and Data (en-gb) ---
+        const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=";
+        let apiKey = ""; // Will use default environment API key if available
+
+        // ** CUSTOM AQA MARK SCHEME TEXT & EXAMINER GUIDANCE **
+        // This content is derived directly from the AQA 8035/1 June 2024 Mark Scheme and Written Report on the Exam.
+        let CUSTOM_RUBRIC = `
+**AQA GCSE GEOGRAPHY LEVEL DESCRIPTORS (EXTENDED RESPONSE)**
+
+**L3 (7-9 Marks / 5-6 Marks):** Answers demonstrate detailed geographical knowledge and thorough understanding (AO1/AO2). Response must include place-specific detail, specific geographical evidence, and thorough explanation of processes/interrelationships. For 9-mark discussion questions, the answer must present a balanced, substantiated assessment/evaluation (AO3).
+**L2 (4-6 Marks / 3-4 Marks):** Shows clear knowledge and reasonable understanding (AO1/AO2) with linked/elaborated statements. May refer to a named example but may lack depth/specific data. For extended writing, assessment (AO3) is present but limited or lacking substance.
+**L1 (1-3 Marks / 1-2 Marks):** Contains basic knowledge (AO1) and limited understanding (AO2). Simple or generic statements lacking development or place-specific detail.
+
+**AQA EXAMINER GUIDANCE & MISCONCEPTIONS (WRE):**
+1.  **SPaG (12-Markers):** Max 3 marks for consistent accuracy, effective grammatical control, and wide use of specialist terms (geographical vocabulary).
+2.  **2/4 Markers:** MUST use linked points to develop the answer beyond a simple list or single idea. Check for single brief points that limit a response to 1 mark (e.g., Q1.4, Q2.1 guidance).
+3.  **Case Studies:** Answers needing exemplification (e.g., 4, 6, 9 marks) must use specific, named places and data (e.g., iron ore in Carajas, not just 'the Amazon'). Generic answers are capped at Level 2 (e.g., Q3.5 guidance).
+4.  **Tectonic Hazards:** Go beyond generic reasons (family/poverty); include tectonic-specific positives (geothermal energy, fertile soil) (e.g., Q1.9 guidance).
+5.  **Tropical Rainforests:** Avoid confusion between cutting down trees (logging) and clearance for specific agriculture (e.g., clearance to *plant* palm oil, not cutting down trees to *extract* it) (e.g., Q2.6 guidance).
+6.  **Coastal Processes (Q3.6):** Must integrate processes (hydraulic action, abrasion) into the formation sequence (cave-arch-stack-stump) and not just list them.
+7.  **Command Words:** Guide students to address the specific command word (e.g., 'discuss' requires a balanced evaluation, not just a description of facts).
+`; 
+
+        // Adapted AQA GCSE Geography 8035 Syllabus
+        // NOTE: Glaciation, Energy, and Food topics are omitted as requested.
+        const SYLLABUS = {
+            "Paper 1: Living with the physical environment": {
+                "The Challenge of Natural Hazards": [
+                    "Tectonic hazards (volcanoes and earthquakes)",
+                    "Tropical storms",
+                    "Weather hazards in the UK",
+                    "Climate change"
+                ],
+                "Physical Landscapes in the UK": [
+                    "Coastal landscapes",
+                    "River landscapes"
+                ],
+                "The Living World": [
+                    "Ecosystems and biomes",
+                    "Tropical rainforests",
+                    "Hot deserts"
+                ]
+            },
+            "Paper 2: Challenges in the human environment": {
+                "Urban Issues and Challenges": [
+                    "Urbanisation trends",
+                    "Case study of a major UK city (e.g., London)",
+                    "Case study of a city in a LIC/NEE (e.g., Lagos)"
+                ],
+                "The Changing Economic World": [
+                    "Global variations in development and quality of life",
+                    "Reducing the development gap",
+                    "The UK's changing economy"
+                ],
+                "Resource Management": [
+                    "Resource reliance and sustainable supply (Water focus)",
+                    "Water management strategies and conflicts"
+                ]
+            }
+        };
+        
+        const MARK_TARIFFS = [2, 4, 6, 9, 12];
+
+        // --- DOM Elements ---
+        const paperSelect = document.getElementById('paper-select');
+        const unitSelect = document.getElementById('unit-select');
+        const topicSelect = document.getElementById('topic-select');
+        const tariffSelect = document.getElementById('tariff-select'); 
+        const generateBtn = document.getElementById('generate-btn');
+        const feedbackBtn = document.getElementById('feedback-btn');
+        const statusMessage = document.getElementById('status-message');
+        const questionArea = document.getElementById('question-area');
+        const questionDisplay = document.getElementById('question-display');
+        const answerInput = document.getElementById('answer-input');
+        const feedbackArea = document.getElementById('feedback-area');
+        const feedbackDisplay = document.getElementById('feedback-display');
+        const helpContentDisplay = document.getElementById('help-content-display');
+        const sampleResponseArea = document.getElementById('sample-response-area');
+        const sampleDisplay = document.getElementById('sample-display');
+        
+        const indicativeContainer = document.getElementById('indicative-content-container');
+        const indicativeText = document.getElementById('indicative-content-text');
+        const strategyContainer = document.getElementById('strategy-guide-container');
+        const strategyText = document.getElementById('strategy-guide-text');
+
+
+        let currentQuestion = "";
+        let currentQuestionMark = 0; 
+        let currentUnit = "";
+        let currentTopic = "";
+
+
+        // --- Utility Functions ---
+
+        /**
+         * Generic API caller with exponential backoff for retries.
+         * @param {object} payload - The body for the POST request.
+         * @param {boolean} useGrounding - Whether to enable Google Search grounding.
+         * @returns {Promise<string>} The generated text content.
+         */
+        async function fetchGemini(payload, useGrounding = false) {
+            statusMessage.classList.remove('hidden');
+            const key = apiKey || (typeof __api_key !== 'undefined' ? __api_key : '');
+
+            // IMPORTANT: Since this file is meant for self-hosting, it relies on the environment
+            // to provide the key.
+            
+            const url = `${API_URL}${key}`;
+            const maxRetries = 3;
+
+            if (useGrounding) {
+                payload.tools = [{ "google_search": {} }];
+            }
+
+            for (let attempt = 0; attempt < maxRetries; attempt++) {
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        if (response.status === 429 && attempt < maxRetries - 1) {
+                            const delay = Math.pow(2, attempt) * 1000;
+                            await new Promise(resolve => setTimeout(resolve, delay));
+                            continue;
+                        }
+                        const errorBody = await response.json();
+                        const errorMessage = errorBody.error?.message || response.statusText;
+                        throw new Error(`API Error: ${errorMessage}`);
+                    }
+
+                    const result = await response.json();
+                    const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                    if (!text) {
+                        throw new Error("Generated content was empty or structured unexpectedly.");
+                    }
+
+                    statusMessage.classList.add('hidden');
+                    return text;
+
+                } catch (error) {
+                    console.error("Gemini API call failed:", error);
+                    if (attempt === maxRetries - 1) {
+                         statusMessage.classList.add('hidden');
+                         throw new Error(`Failed to process request: ${error.message}`);
+                    }
+                }
+            }
+        }
+
+        // --- UI Setup ---
+
+        /** Fills the paper and tariff dropdowns on load. */
+        function initializeSelectors() {
+            for (const paper in SYLLABUS) {
+                const option = document.createElement('option');
+                option.value = paper;
+                option.textContent = paper;
+                paperSelect.appendChild(option);
+            }
+            MARK_TARIFFS.forEach(tariff => {
+                const option = document.createElement('option');
+                option.value = tariff;
+                option.textContent = `${tariff} marks`;
+                tariffSelect.appendChild(option);
+            });
+            // Ensure initial state
+            updateUnits();
+        }
+
+        /** Updates the Unit dropdown based on the selected Paper. */
+        window.updateUnits = function() {
+            const paper = paperSelect.value;
+            unitSelect.innerHTML = '<option value="">-- Select Unit --</option>';
+            topicSelect.innerHTML = '<option value="">-- Select Topic --</option>';
+
+            if (paper && SYLLABUS[paper]) {
+                unitSelect.disabled = false;
+                unitSelect.classList.remove('bg-gray-100');
+                for (const unit in SYLLABUS[paper]) {
+                    const option = document.createElement('option');
+                    option.value = unit;
+                    option.textContent = unit;
+                    unitSelect.appendChild(option);
+                }
+            } else {
+                unitSelect.disabled = true;
+                unitSelect.classList.add('bg-gray-100');
+            }
+            topicSelect.disabled = true;
+            topicSelect.classList.add('bg-gray-100');
+            checkSelections();
+        }
+
+        /** Updates the Topic dropdown based on the selected Unit. */
+        window.updateTopics = function() {
+            const paper = paperSelect.value;
+            const unit = unitSelect.value;
+            topicSelect.innerHTML = '<option value="">-- Select Topic --</option>';
+
+            if (paper && unit && SYLLABUS[paper] && SYLLABUS[paper][unit]) {
+                topicSelect.disabled = false;
+                topicSelect.classList.remove('bg-gray-100');
+                SYLLABUS[paper][unit].forEach(topic => {
+                    const option = document.createElement('option');
+                    option.value = topic;
+                    option.textContent = topic;
+                    topicSelect.appendChild(option);
+                });
+            } else {
+                topicSelect.disabled = true;
+                topicSelect.classList.add('bg-gray-100');
+            }
+            checkSelections();
+        }
+
+        /** Enables/disables the Generate button based on selection state. */
+        window.checkSelections = function() {
+            if (paperSelect.value && unitSelect.value && topicSelect.value && tariffSelect.value) {
+                generateBtn.disabled = false;
+            } else {
+                generateBtn.disabled = true;
+            }
+        }
+
+        /** Resets the interface for a new practice round. */
+        window.resetPractice = function() {
+            questionArea.classList.add('hidden');
+            feedbackArea.classList.add('hidden');
+            helpContentDisplay.classList.add('hidden');
+            sampleResponseArea.classList.add('hidden');
+            indicativeContainer.classList.add('hidden');
+            strategyContainer.classList.add('hidden');
+            
+            questionDisplay.innerHTML = '';
+            answerInput.value = '';
+            feedbackDisplay.innerHTML = '';
+            sampleDisplay.innerHTML = '<p>Click a button above to generate a model response based on the question.</p>';
+            currentQuestion = "";
+            currentQuestionMark = 0;
+            currentUnit = "";
+            currentTopic = "";
+        }
+
+
+        // --- Core Logic Functions ---
+
+        /** Generates an exam question using the Gemini API with Search Grounding. */
+        window.generateQuestion = async function() {
+            resetPractice();
+            const paper = paperSelect.value;
+            const unit = unitSelect.value;
+            const topic = topicSelect.value;
+            
+            const selectedMark = parseInt(tariffSelect.value);
+            currentQuestionMark = selectedMark;
+            currentUnit = unit;
+            currentTopic = topic;
+
+            if (!paper || !unit || !topic || !selectedMark) return;
+            generateBtn.disabled = true; // Disable during generation
+
+            // System prompt incorporates WRE guidance on question quality and command words
+            const systemPrompt = `You are a highly experienced AQA GCSE Geography exam setter. Your goal is to generate a challenging, realistic exam-style question for the specified topic, using the structure and command words (e.g., 'Outline', 'Explain', 'Suggest', 'Examine', 'Discuss') found in AQA 8035 past papers.
+            
+The question MUST have a mark tariff of exactly ${selectedMark} marks. Ensure the question is written in clear British English (en-gb) and requires:
+- Specific geographical terminology (as opposed to generic language).
+- Place-specific detail or case study reference (if 4, 6, 9, or 12 marks).
+- For 9 and 12-markers: A discursive or evaluative command (e.g., 'Discuss', 'To what extent').
+- The question MUST clearly state the mark tariff, e.g., (${selectedMark} marks). Start the question immediately without preamble.`;
+            
+            const userQuery = `Generate a GCSE AQA Geography question for ${paper} on the topic of '${topic}' within the unit '${unit}'. The question must be worth ${selectedMark} marks.`;
+
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+            };
+
+            try {
+                const generatedText = await fetchGemini(payload, true);
+                currentQuestion = generatedText.trim();
+
+                questionDisplay.innerHTML = `<p class="text-lg font-medium text-gray-800">${currentQuestion}</p>`;
+                questionArea.classList.remove('hidden');
+                feedbackBtn.disabled = false;
+                
+                // Update sample response button text
+                if (currentQuestionMark >= 2) {
+                    sampleResponseArea.classList.remove('hidden');
+                    
+                    if (currentQuestionMark >= 6) {
+                        document.getElementById('sample-l2-btn').textContent = `Level 2 Response (e.g., ${Math.floor(currentQuestionMark * 0.55)}/${currentQuestionMark})`;
+                        document.getElementById('sample-l3-btn').textContent = `Level 3 Response (e.g., ${Math.floor(currentQuestionMark * 0.85)}/${currentQuestionMark})`;
+                    } else { // 2 or 4 marks
+                        document.getElementById('sample-l2-btn').textContent = `Mid-Mark Response (e.g., ${Math.floor(currentQuestionMark * 0.5)}/${currentQuestionMark})`;
+                        document.getElementById('sample-l3-btn').textContent = `Top-Mark Response (e.g., ${currentQuestionMark}/${currentQuestionMark})`;
+                    }
+                } else {
+                    sampleResponseArea.classList.add('hidden');
+                }
+
+            } catch (error) {
+                questionDisplay.innerHTML = `<p class="text-red-600">Error generating question: ${error.message}</p>`;
+                console.error(error);
+            } finally {
+                generateBtn.disabled = false; // Re-enable regardless of outcome
+            }
+        }
+
+        /** Utility function to clean and format text (bolding and list structure) */
+        function formatHintText(markdown) {
+            // 1. Convert markdown bolding (**) to HTML bolding (<b>)
+            let cleanHtml = markdown.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+            
+            // 2. Split into major sections/titles
+            const sections = cleanHtml.split('\n\n').filter(s => s.trim().length > 0);
+            let finalHtml = '';
+
+            sections.forEach(section => {
+                const lines = section.trim().split('\n').filter(l => l.trim().length > 0);
+                
+                // Check if the first line is a header (starts with a bold tag)
+                if (lines[0].startsWith('<b>')) {
+                    const title = lines[0].trim();
+                    const contentLines = lines.slice(1);
+                    
+                    finalHtml += `<b class="section-title">${title}</b>`;
+                    
+                    if (contentLines.length > 0) {
+                        // Assume content is a bulleted list (must replace leading - with list items)
+                        finalHtml += `<ul>${contentLines.map(item => `<li>${item.replace(/^- /, '').replace(/^-/, '').trim()}</li>`).join('')}</ul>`;
+                    }
+                } else {
+                    // Otherwise, just treat as a paragraph or a continuation list
+                    finalHtml += `<p>${lines.join('<br>')}</p>`;
+                }
+            });
+
+            return finalHtml;
+        }
+
+
+        /** Fetches indicative content (notes) for the current question. */
+        window.getIndicativeContent = async function() {
+            if (!currentQuestion) return;
+            indicativeText.innerHTML = `<div class="text-center py-2"><svg class="animate-spin h-5 w-5 text-blue-500 inline-block mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Generating notes...</div>`;
+            
+            helpContentDisplay.classList.remove('hidden');
+            indicativeContainer.classList.remove('hidden');
+
+
+            const systemPrompt = `You are a GCSE Geography tutor providing essential revision notes for a student about to answer an exam question. The notes must be **extremely concise** (maximum 8-10 points total), accurate, and in British English (en-gb).
+
+**Task:** Provide a bullet-pointed list of indicative content. Use markdown list formatting (-) and use **bold text** for tier-three geographical vocabulary (e.g., **mitigation**, **liquefaction**, **subsistence farming**). If there are two distinct categories (e.g., Short-term and Long-term), use an emboldened title for each category. Avoid complex sentences, explanations, or unnecessary punctuation.
+`;
+            const userQuery = `The question is: '${currentQuestion}'. The topic area is '${currentTopic}' in the unit '${currentUnit}'. Provide the indicative content.`;
+
+            try {
+                const notes = await fetchGemini(
+                    { contents: [{ parts: [{ text: userQuery }] }], systemInstruction: { parts: [{ text: systemPrompt }] } },
+                    false
+                );
+                
+                indicativeText.innerHTML = formatHintText(notes);
+
+            } catch (error) {
+                indicativeText.innerHTML = `<p class="text-red-600">Error generating notes: ${error.message}</p>`;
+                console.error(error);
+            }
+        }
+
+        /** Fetches strategy guide for the current question. */
+        window.getStrategyGuide = async function() {
+            if (!currentQuestion) return;
+            strategyText.innerHTML = `<div class="text-center py-2"><svg class="animate-spin h-5 w-5 text-blue-500 inline-block mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Generating guide...</div>`;
+            
+            helpContentDisplay.classList.remove('hidden');
+            strategyContainer.classList.remove('hidden');
+
+
+            const systemPrompt = `You are an AQA GCSE Geography tutor using the Examiners' Report (WRE) to guide students on exam technique.
+
+**Task:** Provide a specific, concise strategy guide for the question: '${currentQuestion}' (Worth ${currentQuestionMark} marks). Use markdown list formatting (-) and use **bold text** only for key instructions or structural terms.
+- **Structure:** Provide the ideal structure (e.g., **P.E.E.L.** or **Point and Development**) for this mark tariff.
+- **Requirements:** List the essential requirements that may be missed (e.g., mandatory **case study** for L3, need for **comparison**, **balanced argument**, or **conclusion**).
+- **Command Word:** Explain the command word (**e.g., Explain** or **Discuss**).
+- **Warning:** Include one concise warning about a common misconception or error based on the topic.
+`;
+            const userQuery = `Provide the structure and strategy guide for the question.`;
+
+            try {
+                const guide = await fetchGemini(
+                    { contents: [{ parts: [{ text: userQuery }] }], systemInstruction: { parts: [{ text: systemPrompt }] } },
+                    false
+                );
+                
+                strategyText.innerHTML = formatHintText(guide);
+
+            } catch (error) {
+                strategyText.innerHTML = `<p class="text-red-600">Error generating guide: ${error.message}</p>`;
+                console.error(error);
+            }
+        }
+
+        /** Generates a sample response at a specified quality level. */
+        window.generateSampleResponse = async function(level) {
+            if (!currentQuestion) return;
+            
+            sampleDisplay.innerHTML = `<div class="text-center py-4"><svg class="animate-spin h-6 w-6 text-purple-600 inline-block mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Generating ${level} model answer...</div>`;
+
+            let qualityInstruction = "";
+            let targetMark = 0;
+            const contentMark = currentQuestionMark > 9 ? 9 : currentQuestionMark; // Max content mark is 9
+            const isExtended = currentQuestionMark >= 6;
+            const isShort = currentQuestionMark <= 4;
+            
+            if (isShort) {
+                // ULTRA-CONCISE RESPONSE (2 or 4 marks)
+                targetMark = (level === 'L3') ? currentQuestionMark : Math.floor(currentQuestionMark * 0.5);
+                
+                if (currentQuestionMark === 2) {
+                     // Max 3 short sentences/fragments
+                     qualityInstruction = `Generate a Level ${level} response. The response MUST be ultra-concise (maximum 3 short sentences/fragments). For full marks, include two linked points or developed phrases to earn the two marks efficiently. The expected length is 1-2 concise, developed sentences/fragments.`;
+                } else if (currentQuestionMark === 4) {
+                     // Max 4-5 developed sentences
+                     qualityInstruction = `Generate a Level ${level} response. The response MUST be concise (maximum 4-5 developed sentences total). It must consist of two distinct, developed points or one very detailed and well-linked explanation. The expected length is 4-5 concise, developed sentences.`;
+                }
+
+            } else if (isExtended) {
+                // EXTENDED RESPONSE (6, 9, or 12 marks)
+                
+                if (level === 'L3') {
+                    targetMark = contentMark - 1; // Aim for high L3
+                    // Strict Length Control: Max 250 words, 3 body paragraphs + conclusion
+                    qualityInstruction = `Generate a Level 3 (high quality) response. The answer MUST be well-structured into 3 highly developed paragraphs plus a conclusion (maximum 250 words total). Include specific place-based evidence (case study) and a clear, sustained, and justified judgement or evaluation. The mark should be approximately ${targetMark}/${currentQuestionMark}.`;
+                } else if (level === 'L2') {
+                    targetMark = Math.floor(contentMark * 0.55); // Aim for mid-L2
+                    // Strict Length Control: Max 150 words, 2-3 simple paragraphs.
+                    qualityInstruction = `Generate a Level 2 (medium quality) response. The answer should be structured into 2-3 simple paragraphs (maximum 150 words total). It must use basic case study information, but deliberately LACK specific numerical data or a strong, justified conclusion/judgement. The mark should be approximately ${targetMark}/${currentQuestionMark}.`;
+                }
+            }
+            
+            // Adjust 12-mark target for SPaG (assuming L3 model has full SPaG marks, L2 has some)
+            if (currentQuestionMark === 12) {
+                targetMark = level === 'L3' ? 11 : 7; // e.g. 8/9 content + 3 SPaG = 11/12 (L3) or 5/9 content + 2 SPaG = 7/12 (L2)
+                qualityInstruction += ` The total mark is out of 12 (9 content + 3 SPaG). Assume the response scores high SPaG (3/3) for L3 and mid-SPaG (2/3) for L2.`;
+            }
+
+
+            const systemPrompt = `You are generating a model AQA GCSE Geography exam response. 
+            
+            Instructions:
+            1. **Content:** Directly answer the question in essay format (do not use bullet points or lists in the final response).
+            2. **Style:** Write in professional British English, maintaining the quality standard specified below.
+            3. **Length and Quality Level:** ${qualityInstruction}
+            
+            The question is: '${currentQuestion}'.`;
+
+            const userQuery = `Generate the full model response based on the instructions.`;
+
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+            };
+
+            try {
+                const generatedResponse = await fetchGemini(payload, false);
+                
+                const markInfo = (level === 'L3')
+                    ? `<p class="text-lg font-bold text-purple-700">Top-Mark Response (Approx. ${targetMark}/${currentQuestionMark} Marks)</p>`
+                    : `<p class="text-lg font-bold text-yellow-700">Mid-Mark Response (Approx. ${targetMark}/${currentQuestionMark} Marks)</p>`;
+
+                // Use simple paragraphs for the response body
+                let htmlResponse = generatedResponse.split('\n\n').map(p => `<p class="mb-3">${p.trim()}</p>`).join('');
+
+                sampleDisplay.innerHTML = markInfo + `<div class="mt-4 border-t border-gray-300 pt-3">${htmlResponse}</div>`;
+                
+            } catch (error) {
+                sampleDisplay.innerHTML = `<p class="text-red-600">Error generating sample response: ${error.message}</p>`;
+                console.error(error);
+            }
+        }
+
+
+        /** Gets feedback and a mark/level for the student's answer using the Gemini API. */
+        window.getFeedback = async function() {
+            const answer = answerInput.value.trim();
+            if (!currentQuestion || !answer || currentQuestionMark === 0) {
+                feedbackDisplay.innerHTML = '<p class="text-red-600">Please generate a question and provide an answer first.</p>';
+                feedbackArea.classList.remove('hidden');
+                return;
+            }
+
+            // Disable button while processing
+            feedbackBtn.disabled = true;
+
+            let markStructureInstruction = `The numerical mark must be X/${currentQuestionMark}.`;
+            let levelInstruction = ""; 
+            let outputFormatInstruction = `**Mark:** [X/${currentQuestionMark}] **Feedback:** [Well done sentence]. [Improvement sentence].`;
+            let rubricContext = "";
+
+            if (currentQuestionMark >= 6) {
+                // Extended response questions get the Level and rubric context
+                levelInstruction = "2. Level: Assign the corresponding AQA Level (Level 1, Level 2, or Level 3) based on the quality of the answer and the numerical mark, referencing the provided AQA Grading Context.";
+                outputFormatInstruction = `**Mark:** [X/${currentQuestionMark}] **Level:** [Level 1/Level 2/Level 3] **Feedback:** [Well done sentence]. [Improvement sentence].`;
+                rubricContext = "--- AQA Grading Context ---\n" + CUSTOM_RUBRIC + "\n--- End AQA Grading Context ---";
+                
+                if (currentQuestionMark === 12) {
+                    // Specific instruction for 9+3 SPaG, referencing WRE guidance for SPaG scoring
+                    markStructureInstruction = `The maximum mark is 12, structured as 9 marks for geographical content/analysis and 3 marks for SPaG (Spelling, Punctuation, and Grammar). Your assigned mark must reflect this 9+3 breakdown, resulting in a total X/12 mark. The 3 SPaG marks must be awarded based on consistent accuracy, effective grammar, and wide use of specialist terms.`;
+                }
+            } else if (currentQuestionMark === 2 || currentQuestionMark === 4) {
+                 // For 2/4 markers, emphasize WRE guidance on development (linked points)
+                 markStructureInstruction = `The numerical mark must be X/${currentQuestionMark}. For this low-tariff question, ensure the student provides a developed explanation using linked points, not just a single brief statement.`;
+                 outputFormatInstruction = `**Mark:** [X/${currentQuestionMark}] **Feedback:** [Well done sentence]. [Improvement sentence].`;
+            }
+
+            // Building the full system prompt
+            const systemPrompt = `You are a strict AQA GCSE Geography examiner/tutor. Your task is to provide concise, constructive feedback, a numerical mark, and the AQA Level (if applicable) for the student's submitted answer. 
+            
+${rubricContext}
+
+${markStructureInstruction}
+
+Use British English (en-gb). 
+1. Numerical Mark: Assign a numerical mark (e.g., X/${currentQuestionMark}). 
+${levelInstruction ? levelInstruction + '\n' : ''}
+3. Feedback: Provide one concise sentence on what the student did well, and one concise sentence on the main area for improvement. Your feedback MUST be informed by the AQA Examiner Guidance provided, specifically calling out common misconceptions or requirements (e.g., 'Need to include place-specific data', or 'The answer is too generic and lacks tectonic-specific points').
+4. Format: Output ONLY the following sections, using Markdown bolding for the section headers, and no extra text or explanation: ${outputFormatInstruction}. DO NOT include any qualitative grade like 'Distinction', 'Merit', or 'Pass'.`;
+
+            
+            const userQuery = `The question asked was: '${currentQuestion}'. The student's answer was: '${answer}'. Provide feedback and a mark according to the system instruction.`;
+
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+            };
+
+            try {
+                const generatedFeedback = await fetchGemini(payload, false);
+                
+                // Format the output by replacing Markdown bolding with styled HTML tags
+                const formattedFeedback = generatedFeedback
+                    .replace(/\*\*(Mark):\*\*/g, (match, p1) => `<b>${p1}:</b>`) 
+                    .replace(/\*\*(Level):\*\*/g, (match, p1) => `<b>${p1}:</b>`) 
+                    .replace(/\*\*(Feedback):\*\*/g, (match, p1) => `<b>${p1}:</b>`)
+                    .trim();
+
+                feedbackDisplay.innerHTML = `<div class="prose">${formattedFeedback}</div>`;
+                feedbackArea.classList.remove('hidden');
+            } catch (error) {
+                feedbackDisplay.innerHTML = `<p class="text-red-600">Error receiving feedback: ${error.message}</p>`;
+                console.error(error);
+            } finally {
+                feedbackBtn.disabled = false;
+            }
+        }
+
+        // Initialize the app on load
+        window.onload = initializeSelectors;
+
+    </script>
+</body>
+</html>
