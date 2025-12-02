@@ -185,7 +185,14 @@
     <script type="module">
         // --- Configuration and Data (en-gb) ---
         const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=";
-        let apiKey = "AIzaSyDhNecb18VexMhdv5SvL5q-C_JZ7AV9f3g"; // Will use default environment API key if available
+const VITE_KEY_NAME = 'VITE_GEMINI_API_KEY';
+// This line checks if the key was injected during the Vercel build process.
+let apiKey = (typeof import.meta !== 'undefined' && import.meta.env[VITE_KEY_NAME]) || '';
+
+// Fallback check (less secure, but keeps the app working if Vercel setup is complex)
+if (!apiKey) {
+    apiKey = typeof __api_key !== 'undefined' ? __api_key : '';
+}
 
         // ** CUSTOM AQA MARK SCHEME TEXT & EXAMINER GUIDANCE **
         // This content is derived directly from the AQA 8035/1 June 2024 Mark Scheme and Written Report on the Exam.
@@ -751,4 +758,5 @@ ${levelInstruction ? levelInstruction + '\n' : ''}
 </body>
 
 </html>
+
 
